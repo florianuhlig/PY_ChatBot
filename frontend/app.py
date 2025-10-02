@@ -14,14 +14,14 @@ def home():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    import sqlLite.get as getter
+    import standard.getter as st_getter
     import sqlLite.set as setter
-    import useful.hash as hasher
+
     if request.method == 'POST':
-        username = request.form['username'].strip()
-        email = request.form.get('email').strip()
-        password = request.form.get('password').strip()
-        pwd_confirm = request.form.get('confirm_password').strip()
+        username = request.form['username']
+        email = request.form.get('email')
+        password = request.form.get('password')
+        pwd_confirm = request.form.get('confirm_password')
 
         if not email or not password or not pwd_confirm or not username:
             flash('Please fill out all fields', 'error')
@@ -30,18 +30,22 @@ def register():
         if password != pwd_confirm:
             flash('Passwords do not match', 'error')
             return redirect(url_for('register'))
-        # Hash the password
-        hashed_password = hasher.sha512(password.encode('utf-8')).hexdigest()
+
         try:
-            # Call your setter function to add user to DB
-            setter.set_login(username, email, hashed_password)
-            flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('login'))
+            if st_getter.get_validate_email(email):
+                setter.set_login(username, email, password)
+                flash('Registration successful! Please log in.', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash('Invalid email format', 'error')
+                return redirect(url_for('register'))
         except Exception as e:
             flash(f'Error: {str(e)}', 'error')
             return redirect(url_for('register'))
-
+    # For GET-requests:
     return render_template('register.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -49,6 +53,7 @@ def login():
         enter_password = request.form.get('password')
         import hashlib
         import sqlLite.get as getter
+        import standard.getter as st_getter
 
         stored_hash = getter.get_password_by_email(enter_email)  # use email here
 
@@ -56,7 +61,7 @@ def login():
             flash("User not found!")
             return redirect(url_for("login"))
 
-        hash_entered = hashlib.sha512(enter_password.encode('utf-8')).hexdigest()
+        hash_entered = st_getter.get_password_hash(enter_password)
 
         if hash_entered == stored_hash:
             return redirect(url_for('dashboard'))
@@ -70,4 +75,5 @@ def login():
 
 @app.route('/dashboard')
 def dashboard():
-    return "Welcome to the dashboard! Login successful."
+    #return "Welcome to the dashboard! Login successful."
+    return render_template('dashboard.html')

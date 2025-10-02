@@ -72,7 +72,6 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    input[type="username"]:focus,
     input[type="email"]:focus,
     input[type="password"]:focus {
       border-color: #2575fc;
@@ -116,37 +115,5 @@
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Create an Account</h2>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="error-message" style="display:block;">
-          {% for category, message in messages %}
-            {{ message }}
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-    <form method="POST" action="{{ url_for('register') }}">
-      <div class="input-group">
-          <label for="username">Username</label>
-          <input type="username" id="username" name="username" placeholder="username" required />
-      </div>
-      <div class="input-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" placeholder="you@example.com" required />
-      </div>
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Create a password" required />
-      </div>
-      <div class="input-group">
-        <label for="confirm_password">Confirm Password</label>
-        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required />
-      </div>
-      <button type="submit">Register</button>
-      <p style="margin-top: 20px; font-size: 14px;">Already have an account? <a href="{{ url_for('login') }}">Log in here</a>.</p>
-    </form>
-  </div>
 </body>
 </html>
