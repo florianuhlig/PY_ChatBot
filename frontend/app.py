@@ -12,13 +12,10 @@ def login():
     if request.method == 'POST':
         enter_email = request.form.get('email')
         enter_password = request.form.get('password')
-        # TODO: Add your user verification logic here, e.g. check database
         import sqlLite.get as getter
         import useful.hash as hasher
         pwd = getter.get_password_by_email(enter_email)
         password = hasher.get_password_hash(enter_password)
-        print(pwd)
-        print(password)
         if password == pwd:
             return redirect(url_for('dashboard'))
         elif password == None:
