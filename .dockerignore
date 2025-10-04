@@ -1,0 +1,42 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.env
+.venv
+pip-log.txt
+
+# Development
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Project specific
+data/*.db
+logs/*
+tests/
+docs/
+*.md
+!README.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.docker
+
+# Temporary files
+*.log
+*.sqlite
+*.db
+temp/
+tmp/
