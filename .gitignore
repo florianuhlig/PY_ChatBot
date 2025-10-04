@@ -2,3 +2,5 @@
 /.idea/
 testing.py
 /databases/
+
+.env

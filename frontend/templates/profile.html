@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile - ChatBot</title>
+    <style>
+        /* Use similar styles as dashboard */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .profile-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .profile-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .profile-content {
+            padding: 40px;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .info-card p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .back-link {
+            margin-bottom: 20px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1>{{ user.username }}</h1>
+            <p>User Profile</p>
+        </div>
+
+        <div class="profile-content">
+            <div class="back-link">
+                <a href="{{ url_for('dashboard') }}">&larr; Back to Dashboard</a>
+            </div>
+
+            <div class="profile-info">
+                <div class="info-card">
+                    <h3>Account Details</h3>
+                    <p><strong>User ID:</strong> #{{ user.id }}</p>
+                    <p><strong>Username:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Account Status</h3>
+                    <p><strong>Status:</strong> <span style="color: #28a745;">Active</span></p>
+                    <p><strong>Created:</strong> {{ user.created_at[:19] if user.created_at else 'Unknown' }}</p>
+                    <p><strong>Last Updated:</strong> {{ user.updated_at[:19] if user.updated_at else 'Unknown' }}</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{{ url_for('change_password') }}" class="btn">Change Password</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
