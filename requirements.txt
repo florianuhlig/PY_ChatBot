@@ -1,1 +1,36 @@
-flask
+# Requirements for PY_ChatBot
+# Core Framework
+Flask>=2.3.0,<3.0.0
+Werkzeug>=2.3.0,<3.0.0
+
+# Database & ORM (Optional for future expansion)
+SQLAlchemy>=2.0.0,<3.0.0
+
+# Environment & Configuration
+python-dotenv>=1.0.0
+
+# Security & Authentication
+bcrypt>=4.0.0
+
+# HTTP Client (for health checks and external APIs)
+requests>=2.31.0
+
+# Date/Time utilities
+python-dateutil>=2.8.0
+
+# Development Dependencies (commented out for production)
+# pytest>=7.4.0
+# pytest-flask>=1.2.0
+# pytest-cov>=4.1.0
+# black>=23.7.0
+# flake8>=6.0.0
+# mypy>=1.5.0
+
+# Production WSGI Server
+gunicorn>=21.2.0
+
+# Logging
+colorlog>=6.7.0
+
+# Utility
+click>=8.1.0
