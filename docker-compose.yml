@@ -1,7 +1,6 @@
 services:
-  # Main ChatBot Application
   chatbot:
-    build:
+    build: 
       context: .
       dockerfile: Dockerfile
     container_name: py_chatbot
@@ -12,13 +11,13 @@ services:
       # Database Configuration
       - DB_TYPE=sqlite
       - SQLITE_PATH=/app/data/chatbot.db
-
-      # Flask Configuration
+      
+      # Flask Configuration  
       - FLASK_HOST=0.0.0.0
       - FLASK_PORT=8080
       - FLASK_DEBUG=false
       - FLASK_SECRET_KEY=your-super-secret-key-change-this-in-production
-
+      
       # Session Configuration
       - SESSION_LIFETIME_HOURS=24
       - SESSION_COOKIE_SECURE=false
@@ -36,22 +35,34 @@ services:
       retries: 3
       start_period: 30s
 
-  # Optional: PostgreSQL Database (for production)
-  #postgres:
-  #  image: postgres:15-alpine
-  #  container_name: py_chatbot_postgres
-  #  restart: unless-stopped
-  #  environment:
-  #    - POSTGRES_DB=chatbot
-  #    - POSTGRES_USER=chatbot_user
-  #    - POSTGRES_PASSWORD=secure_password_change_this
-  #  volumes:
-  #    - postgres_data:/var/lib/postgresql/data
-  #    - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-  #  networks:
-  #    - chatbot_network
-  #  profiles:
-  #    - postgres
+  postgres:
+    image: postgres:15-alpine
+    container_name: py_chatbot_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=chatbot
+      - POSTGRES_USER=chatbot_user
+      - POSTGRES_PASSWORD=secure_password_change_this
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - chatbot_network
+    profiles:
+      - postgres
+
+  # Optional: Redis for Session Storage
+  redis:
+    image: redis:7-alpine
+    container_name: py_chatbot_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass secure_redis_password_change_this
+    volumes:
+      - redis_data:/data
+    networks:
+      - chatbot_network
+    profiles:
+      - redis
 
 # Named Volumes
 volumes:
@@ -59,8 +70,10 @@ volumes:
     driver: local
   chatbot_logs:
     driver: local
-  #postgres_data:
-  #  driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
 
 # Networks
 networks:

@@ -2,9 +2,10 @@
 set -e
 
 echo "🤖 Starting PY_ChatBot..."
+# Create directory for database dynamically based on SQLITE_PATH
 
-# Create directories if they don't exist
-mkdir -p /app/databases /app/logs
+DB_DIR=$(dirname "$SQLITE_PATH")
+mkdir -p "$DB_DIR" /app/logs
 
 # Set default environment variables if not provided
 export DB_TYPE=${DB_TYPE:-sqlite}

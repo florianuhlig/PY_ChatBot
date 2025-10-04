@@ -2,7 +2,7 @@
 FROM python:3.11-slim
 
 # Set maintainer
-LABEL maintainer="your-email@example.com"
+LABEL maintainer="fuh@fuhlig.de"
 LABEL description="PY_ChatBot - Modern Flask-based Chatbot Application"
 
 # Set environment variables
