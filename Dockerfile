@@ -20,28 +20,32 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     sqlite3 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 chatbot && \
     adduser --system --uid 1001 --gid 1001 --no-create-home --disabled-password chatbot
 
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/data /app/logs /app/static && \
+    chown -R chatbot:chatbot /app
+
 # Copy requirements first for better Docker layer caching
 COPY requirements.txt .
+RUN chown chatbot:chatbot requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
-
-# Create necessary directories and set permissions
-RUN mkdir -p /app/databases /app/logs /app/static && \
-    chown -R chatbot:chatbot /app
+RUN chown -R chatbot:chatbot .
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
+    chown chatbot:chatbot /usr/local/bin/docker-entrypoint.sh
 
 # Switch to non-root user
 USER chatbot
