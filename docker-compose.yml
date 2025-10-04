@@ -51,19 +51,6 @@ services:
     profiles:
       - postgres
 
-  # Optional: Redis for Session Storage
-  redis:
-    image: redis:7-alpine
-    container_name: py_chatbot_redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass secure_redis_password_change_this
-    volumes:
-      - redis_data:/data
-    networks:
-      - chatbot_network
-    profiles:
-      - redis
-
 # Named Volumes
 volumes:
   chatbot_data:
@@ -71,8 +58,6 @@ volumes:
   chatbot_logs:
     driver: local
   postgres_data:
-    driver: local
-  redis_data:
     driver: local
 
 # Networks
