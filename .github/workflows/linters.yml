@@ -1,9 +1,5 @@
 name: linters
 
-permissions:
-  contents: read
-  workflows: write
-
 on:
   workflow_run:
     workflows: ["Review"]           # EXACT match of the other workflow’s name
