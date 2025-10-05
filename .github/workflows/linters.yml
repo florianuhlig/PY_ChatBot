@@ -1,12 +1,12 @@
-name: Black
+name: linters
 
 on:
-  push:
-    branches:
-      - Development
+  workflow_run:
+  workflows: ["Code Review"]
+    types: ["completed"] #requested
 
 jobs:
-  build-and-test:
+  on-success:
     runs-on: ubuntu-latest
     steps:
 
@@ -32,3 +32,9 @@ jobs:
 
       - name: Run pylint
         run: pylint frontend services utils
+
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - run: echo 'The triggering workflow failed'
