@@ -1,0 +1,31 @@
+name: Unit Test
+
+on:
+  push:
+    branches:
+      - Development
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+
+      # 1. Check out code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Set up Python
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest python-dotenv
+
+      # 6. Run unit tests
+      - name: Run pytest
+        run: pytest
