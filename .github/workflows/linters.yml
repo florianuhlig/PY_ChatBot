@@ -1,8 +1,12 @@
 name: linters
 
+permissions:
+  contents: read
+  workflows: write
+
 on:
-  workflow_run:
-    workflows: ["Review"]           # EXACT match of the other workflow’s name
+  workflow_run:                # ← event name must be workflow_run
+    workflows: ["Review"]      # ← exact name of your triggering workflow
     types: [completed]
 
 jobs:
