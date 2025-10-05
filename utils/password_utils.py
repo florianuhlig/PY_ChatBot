@@ -1,8 +1,9 @@
 import hashlib
-import secrets
 import logging
+import secrets
 
 logger = logging.getLogger(__name__)
+
 
 class PasswordUtils:
     @staticmethod
@@ -11,7 +12,7 @@ class PasswordUtils:
             salt = secrets.token_hex(32)
         password = password.strip()
         salted_password = password + salt
-        hash_object = hashlib.sha512(salted_password.encode('utf-8'))
+        hash_object = hashlib.sha512(salted_password.encode("utf-8"))
         password_hash = hash_object.hexdigest()
         logger.debug("Password hashed successfully")
         return password_hash, salt
@@ -24,4 +25,4 @@ class PasswordUtils:
     @staticmethod
     def hash_password_simple(password: str) -> str:
         password = password.strip()
-        return hashlib.sha512(password.encode('utf-8')).hexdigest()
+        return hashlib.sha512(password.encode("utf-8")).hexdigest()

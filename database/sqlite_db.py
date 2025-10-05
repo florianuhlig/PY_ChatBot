@@ -1,7 +1,8 @@
-import sqlite3
 import logging
+import sqlite3
 from threading import local
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 from .interface import DatabaseInterface
 
 logger = logging.getLogger(__name__)
@@ -17,12 +18,12 @@ class SQLiteDatabase(DatabaseInterface):
 
     def _get_connection(self) -> sqlite3.Connection:
         """Holt oder erstellt eine thread-lokale Verbindung"""
-        if not hasattr(self._local, 'connection') or self._local.connection is None:
+        if not hasattr(self._local, "connection") or self._local.connection is None:
             self._local.connection = sqlite3.connect(
                 self.db_path,
                 check_same_thread=False,  # Erlaubt thread-übergreifende Nutzung
                 timeout=30.0,
-                detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+                detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
             )
             self._local.connection.row_factory = sqlite3.Row
             # Optimierungen für bessere Performance
@@ -45,7 +46,7 @@ class SQLiteDatabase(DatabaseInterface):
 
     def disconnect(self) -> None:
         """Schließt die thread-lokale Verbindung"""
-        if hasattr(self._local, 'connection') and self._local.connection:
+        if hasattr(self._local, "connection") and self._local.connection:
             try:
                 self._local.connection.close()
                 self._local.connection = None
@@ -58,7 +59,8 @@ class SQLiteDatabase(DatabaseInterface):
         conn = self._get_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                            CREATE TABLE IF NOT EXISTS users
                            (
                                id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,7 +68,8 @@ class SQLiteDatabase(DatabaseInterface):
                                email TEXT NOT NULL UNIQUE,
                                password_hash TEXT NOT NULL,
                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ) 
-                           """)
+                           """
+            )
             conn.commit()
             logger.info("User table created/verified")
         except Exception as e:
@@ -82,7 +85,7 @@ class SQLiteDatabase(DatabaseInterface):
         try:
             cursor.execute(
                 "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
-                (username, email, password_hash)
+                (username, email, password_hash),
             )
             conn.commit()
             logger.info(f"User created successfully: {email}")
@@ -105,7 +108,7 @@ class SQLiteDatabase(DatabaseInterface):
         try:
             cursor.execute(
                 "SELECT id, username, email, password_hash, created_at FROM users WHERE email = ?",
-                (email,)
+                (email,),
             )
             row = cursor.fetchone()
             return dict(row) if row else None
@@ -122,7 +125,7 @@ class SQLiteDatabase(DatabaseInterface):
         try:
             cursor.execute(
                 "SELECT id, username, email, password_hash, created_at FROM users WHERE username = ?",
-                (username,)
+                (username,),
             )
             row = cursor.fetchone()
             return dict(row) if row else None
@@ -137,10 +140,7 @@ class SQLiteDatabase(DatabaseInterface):
         conn = self._get_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute(
-                "SELECT password_hash FROM users WHERE email = ?",
-                (email,)
-            )
+            cursor.execute("SELECT password_hash FROM users WHERE email = ?", (email,))
             row = cursor.fetchone()
             return row if row else None
         except Exception as e:
@@ -156,7 +156,7 @@ class SQLiteDatabase(DatabaseInterface):
         try:
             cursor.execute(
                 "UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ?",
-                (new_password_hash, email)
+                (new_password_hash, email),
             )
             conn.commit()
             success = cursor.rowcount > 0
