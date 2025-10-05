@@ -1,16 +1,14 @@
 import logging
 from datetime import datetime, timedelta  # Add this line at the top
 
-from flask import (Flask, flash, redirect, render_template, request, session,
-                   url_for)
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 
 from config.database import DatabaseConfig
 from database import DatabaseFactory
 from database.flask_integration import FlaskDatabaseManager
 from services.auth_service import AuthService
 from services.user_service import UserService
-from utils.auth_decorators import (get_current_user, login_required,
-                                   logout_required)
+from utils.auth_decorators import get_current_user, login_required, logout_required
 
 # Logging konfigurieren
 logging.basicConfig(level=logging.INFO)
