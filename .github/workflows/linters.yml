@@ -2,8 +2,8 @@ name: linters
 
 on:
   workflow_run:
-  workflows: ["Code Review"]
-    types: ["completed"] #requested
+    workflows: ["Code Review"]
+    types: [completed] #requested
 
 jobs:
   on-success:
