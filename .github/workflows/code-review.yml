@@ -1,4 +1,4 @@
-name: Black
+name: Code Review
 
 on:
   push:
@@ -24,22 +24,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install black isort flake8 pylint pytest python-dotenv
+          pip install black isort
 
       # 4. Run code format checks
       - name: Check code formatting with Black
         run: black --check .
 
-      #- name: Check import order with isort
-      #  run: isort --check-only .
-
-      # 5. Run linters
-      #- name: Run flake8
-      #  run: flake8
-
-      #- name: Run pylint
-      #  run: pylint frontend services utils
-
-      # 6. Run unit tests
-      #- name: Run pytest
-      #  run: pytest
+      - name: Check import order with isort
+        run: isort --check-only .
