@@ -1,5 +1,7 @@
 import logging
-from flask import g, current_app
+
+from flask import current_app, g
+
 from .interface import DatabaseInterface
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ class FlaskDatabaseManager:
         Holt die Datenbank-Instanz für den aktuellen Request
         Verwendet Flask's 'g' object für request-lokale Speicherung
         """
-        if 'database' not in g:
+        if "database" not in g:
             g.database = self.database_factory_func()
             g.database.connect()
             g.database.create_user_table()
@@ -28,7 +30,7 @@ class FlaskDatabaseManager:
         """
         Schließt die Datenbank-Verbindung am Ende des Requests
         """
-        database = g.pop('database', None)
+        database = g.pop("database", None)
         if database is not None:
             database.disconnect()
             logger.debug("Database connection closed for request")

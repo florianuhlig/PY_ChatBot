@@ -1,16 +1,20 @@
 import logging
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 from database.interface import DatabaseInterface
 from utils.password_utils import PasswordUtils
 from utils.validation import ValidationUtils
 
 logger = logging.getLogger(__name__)
 
+
 class UserService:
     def __init__(self, database: DatabaseInterface):
         self.db = database
 
-    def create_user(self, username: str, email: str, password: str) -> tuple[bool, list[str]]:
+    def create_user(
+        self, username: str, email: str, password: str
+    ) -> tuple[bool, list[str]]:
         errors = []
 
         # Validierung
@@ -52,7 +56,6 @@ class UserService:
         except Exception as e:
             logger.error(f"Error creating user: {e}")
             return False, [f"Database error: {str(e)}"]
-
 
     def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         if not ValidationUtils.validate_email(email):
