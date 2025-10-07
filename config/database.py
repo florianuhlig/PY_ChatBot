@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Any, Dict
 
 
@@ -10,7 +11,15 @@ class DatabaseConfig:
 
     def _load_config(self) -> Dict[str, Any]:
         if self.db_type.lower() == "sqlite":
-            return {"path": os.getenv("SQLITE_PATH", "databases/chatbot.db")}
+            # Standardpfad relativ zum Projektroot
+            default_path = Path(__file__).parent.parent / "databases" / "chatbot.db"
+            sqlite_path = os.getenv("SQLITE_PATH", str(default_path))
+
+            # Stelle sicher, dass wir einen absoluten Pfad haben
+            if not Path(sqlite_path).is_absolute():
+                sqlite_path = Path.cwd() / sqlite_path
+
+            return {"path": str(sqlite_path)}
         elif self.db_type.lower() == "mysql":
             return {
                 "host": os.getenv("MYSQL_HOST", "localhost"),

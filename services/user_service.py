@@ -12,7 +12,9 @@ class UserService:
     def __init__(self, database: DatabaseInterface):
         self.db = database
 
-    def create_user(self, username: str, email: str, password: str) -> tuple[bool, list[str]]:
+    def create_user(
+        self, username: str, email: str, password: str
+    ) -> tuple[bool, list[str]]:
         errors = self._validate_user_inputs(username, email, password)
         if errors:
             return False, errors
@@ -24,7 +26,9 @@ class UserService:
         password_hash = PasswordUtils.hash_password_simple(password)
         return self._attempt_user_creation(username, email, password_hash)
 
-    def _validate_user_inputs(self, username: str, email: str, password: str) -> list[str]:
+    def _validate_user_inputs(
+        self, username: str, email: str, password: str
+    ) -> list[str]:
         errors = []
         if not ValidationUtils.validate_username(username):
             errors.append("Invalid username format")
@@ -43,7 +47,9 @@ class UserService:
             errors.append("Username already taken")
         return errors
 
-    def _attempt_user_creation(self, username: str, email: str, password_hash: str) -> tuple[bool, list[str]]:
+    def _attempt_user_creation(
+        self, username: str, email: str, password_hash: str
+    ) -> tuple[bool, list[str]]:
         try:
             success = self.db.create_user(username, email.lower(), password_hash)
             if success:

@@ -1,5 +1,6 @@
 import logging
 import sqlite3
+from pathlib import Path
 from threading import local
 from typing import Any, Dict, Optional
 
@@ -13,32 +14,50 @@ class SQLiteDatabase(DatabaseInterface):
 
     def __init__(self, db_path: str):
         self.db_path = db_path
+        # Erstelle Verzeichnis falls nicht vorhanden
+        self._ensure_database_directory()
         # Thread-local storage für Verbindungen
         self._local = local()
+
+    def _ensure_database_directory(self) -> None:
+        """Stellt sicher, dass das Database-Verzeichnis existiert"""
+        db_dir = Path(self.db_path).parent
+        if not db_dir.exists():
+            try:
+                db_dir.mkdir(parents=True, exist_ok=True)
+                logger.info(f"Created database directory: {db_dir}")
+            except OSError as e:
+                logger.error(f"Failed to create database directory {db_dir}: {e}")
+                raise
 
     def _get_connection(self) -> sqlite3.Connection:
         """Holt oder erstellt eine thread-lokale Verbindung"""
         if not hasattr(self._local, "connection") or self._local.connection is None:
-            self._local.connection = sqlite3.connect(
-                self.db_path,
-                check_same_thread=False,  # Erlaubt thread-übergreifende Nutzung
-                timeout=30.0,
-                detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
-            )
-            self._local.connection.row_factory = sqlite3.Row
-            # Optimierungen für bessere Performance
-            self._local.connection.execute("PRAGMA journal_mode=WAL")
-            self._local.connection.execute("PRAGMA synchronous=NORMAL")
-            self._local.connection.execute("PRAGMA cache_size=1000")
-            self._local.connection.execute("PRAGMA temp_store=MEMORY")
-            logger.debug("New SQLite connection created for thread")
-
+            try:
+                # Absoluten Pfad verwenden für bessere Kompatibilität
+                abs_path = Path(self.db_path).resolve()
+                self._local.connection = sqlite3.connect(
+                    str(abs_path),
+                    check_same_thread=False,  # Erlaubt thread-übergreifende Nutzung
+                    timeout=30.0,
+                    detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+                )
+                self._local.connection.row_factory = sqlite3.Row
+                # Optimierungen für bessere Performance
+                self._local.connection.execute("PRAGMA journal_mode=WAL")
+                self._local.connection.execute("PRAGMA synchronous=NORMAL")
+                self._local.connection.execute("PRAGMA cache_size=1000")
+                self._local.connection.execute("PRAGMA temp_store=MEMORY")
+                logger.debug(f"New SQLite connection created for thread: {abs_path}")
+            except sqlite3.Error as e:
+                logger.error(f"Failed to connect to SQLite database at {abs_path}: {e}")
+                raise
         return self._local.connection
 
     def connect(self) -> None:
         """Initialisiert die thread-lokale Verbindung"""
         try:
-            conn = self._get_connection()
+            self._get_connection()  # Entfernt das unbenutzte 'conn'
             logger.info(f"Connected to SQLite database: {self.db_path}")
         except Exception as e:
             logger.error(f"Failed to connect to SQLite database: {e}")
