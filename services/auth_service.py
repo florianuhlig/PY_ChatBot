@@ -1,4 +1,5 @@
 """Frontend Flask application module."""
+
 import logging
 from typing import Any, Dict, Optional
 
