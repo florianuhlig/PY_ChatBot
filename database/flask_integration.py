@@ -1,6 +1,6 @@
 import logging
 
-from flask import current_app, g
+from flask import g
 
 from .interface import DatabaseInterface
 

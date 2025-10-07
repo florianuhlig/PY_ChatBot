@@ -1,13 +1,12 @@
 name: Unit Test
 
 on:
-  workflow_run:
-    workflows: ["linters"]
-    types: [completed] #requested
-
+  push:
+    branches:
+      - main
 
 jobs:
-  on-success:
+  Unit-Test:
     runs-on: ubuntu-latest
     steps:
 
@@ -30,9 +29,3 @@ jobs:
       # 6. Run unit tests
       - name: Run pytest
         run: pytest
-
-  on-failure:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    steps:
-      - run: echo 'The triggering workflow failed'
