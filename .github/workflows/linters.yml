@@ -1,12 +1,9 @@
 name: linters
 
-
 on:
-  workflow_run:                # ← event name must be workflow_run
-    workflows: ["Review"]      # ← exact name of your triggering workflow
-    types: [completed]
-    branches: [Development]
-
+  push:
+    branches:
+      - Development
 jobs:
   on-success:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
