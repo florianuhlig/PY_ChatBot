@@ -1,7 +1,19 @@
-import logging
-from datetime import datetime, timedelta  # Add this line at the top
+"""
+Flask frontend application managing user routes and authentication.
+"""
 
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+import logging
+from datetime import datetime, timedelta
+
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from config.database import DatabaseConfig
 from database import DatabaseFactory
@@ -9,10 +21,12 @@ from database.flask_integration import FlaskDatabaseManager
 from services.auth_service import AuthService
 from services.user_service import UserService
 from utils.auth_decorators import get_current_user, login_required, logout_required
+from utils.password_utils import PasswordUtils
 
 # Logging konfigurieren
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key-change-this-in-production"
@@ -25,7 +39,6 @@ app.config["SESSION_COOKIE_SECURE"] = (
     False  # Für Development - in Production auf True setzen
 )
 app.config["SESSION_COOKIE_HTTPONLY"] = True  # Verhindert XSS-Angriffe
-
 
 # Database Manager initialisieren
 db_config = DatabaseConfig()
@@ -84,12 +97,12 @@ def register():
 
         if success:
             flash("Registration successful! Please log in.", "success")
-            logger.info(f"New user registered: {email}")
+            logger.info("New user registered: %s", email)
             return redirect(url_for("login"))
-        else:
-            for error in errors:
-                flash(error, "error")
-            return redirect(url_for("register"))
+
+        for error in errors:
+            flash(error, "error")
+        return redirect(url_for("register"))
 
     return render_template("register.html")
 
@@ -125,8 +138,8 @@ def login():
             if remember_me:
                 session.permanent = True
 
-            flash(f'Welcome back, {user_data["username"]}!', "success")
-            logger.info(f"User logged in: {email}")
+            flash("Welcome back, " + user_data["username"] + "!", "success")
+            logger.info("User logged in: %s", email)
 
             # Weiterleitung zu ursprünglich angeforderte Seite (falls vorhanden)
             next_page = request.args.get("next")
@@ -134,9 +147,8 @@ def login():
                 return redirect(next_page)
 
             return redirect(url_for("dashboard"))
-        else:
-            flash(message, "error")
-            return redirect(url_for("login"))
+        flash(message, "error")
+        return redirect(url_for("login"))
 
     return render_template("login.html")
 
@@ -151,10 +163,10 @@ def logout():
     # Session komplett löschen
     session.clear()
 
-    flash(f"Goodbye, {username}! You have been logged out successfully.", "info")
+    flash("Goodbye, " + username + "! You have been logged out successfully.", "info")
 
     if user_email:
-        logger.info(f"User logged out: {user_email}")
+        logger.info("User logged out: %s", user_email)
 
     return redirect(url_for("login"))
 
@@ -172,7 +184,7 @@ def dashboard():
         "session_expires": "Never" if session.permanent else "24 hours",
     }
 
-    logger.debug(f"Dashboard accessed by user: {user['email']}")
+    logger.debug("Dashboard accessed by user: %s", user["email"])
 
     return render_template("dashboard.html", user=user, dashboard_data=dashboard_data)
 
@@ -212,24 +224,21 @@ def change_password():
         database = db_manager.get_db()
         auth_service = AuthService(database)
 
-        success, _, message = auth_service.authenticate(user["email"], current_password)
+        success = auth_service.authenticate(user["email"], current_password)
 
         if not success:
             flash("Current password is incorrect", "error")
             return redirect(url_for("change_password"))
 
-        # Neues Passwort setzen
-        from utils.password_utils import PasswordUtils
-
         new_password_hash = PasswordUtils.hash_password_simple(new_password)
 
         if database.update_user_password(user["email"], new_password_hash):
             flash("Password changed successfully", "success")
-            logger.info(f"Password changed for user: {user['email']}")
+            logger.info("Password changed for user: %s", user["email"])
             return redirect(url_for("dashboard"))
-        else:
-            flash("Failed to change password", "error")
-            return redirect(url_for("change_password"))
+
+        flash("Failed to change password", "error")
+        return redirect(url_for("change_password"))
 
     return render_template("change_password.html")
 
@@ -237,12 +246,14 @@ def change_password():
 # Error Handlers
 @app.errorhandler(404)
 def not_found(error):
-    return render_template("404.html"), 404
+    """Handles 404 errors."""
+    return render_template("404.html"), error
 
 
 @app.errorhandler(500)
 def internal_error(error):
-    logger.error(f"Internal server error: {error}")
+    """Handles 500 internal server errors."""
+    logger.error("Internal server error: %s", error)
     flash("An internal error occurred. Please try again.", "error")
     return redirect(url_for("home"))
 
@@ -251,10 +262,7 @@ def internal_error(error):
 @app.before_request
 def check_session_timeout():
     """Prüft ob Session abgelaufen ist"""
-    from datetime import datetime
-
     if "user_id" in session:
-        # Prüfe ob Session zu alt ist (optional)
         login_time = session.get("login_time")
         if login_time:
             try:
