@@ -31,7 +31,7 @@ class SQLiteDatabase(DatabaseInterface):
             self._local.connection.execute("PRAGMA synchronous=NORMAL")
             self._local.connection.execute("PRAGMA cache_size=1000")
             self._local.connection.execute("PRAGMA temp_store=MEMORY")
-            logger.debug(f"New SQLite connection created for thread")
+            logger.debug("New SQLite connection created for thread")
 
         return self._local.connection
 
@@ -61,14 +61,14 @@ class SQLiteDatabase(DatabaseInterface):
         try:
             cursor.execute(
                 """
-                           CREATE TABLE IF NOT EXISTS users
-                           (
-                               id INTEGER PRIMARY KEY AUTOINCREMENT,
-                               username TEXT NOT NULL UNIQUE,
-                               email TEXT NOT NULL UNIQUE,
-                               password_hash TEXT NOT NULL,
-                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ) 
-                           """
+                    CREATE TABLE IF NOT EXISTS users
+                        (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            username TEXT NOT NULL UNIQUE,
+                            email TEXT NOT NULL UNIQUE,
+                            password_hash TEXT NOT NULL,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP )
+                """
             )
             conn.commit()
             logger.info("User table created/verified")

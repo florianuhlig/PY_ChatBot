@@ -5,7 +5,7 @@ on:
     branches:
       - Development
 jobs:
-  on-success:
+  check:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
@@ -27,9 +27,3 @@ jobs:
 
       - name: Run pylint
         run: pylint frontend services utils
-
-  on-failure:
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo 'The Review workflow failed'

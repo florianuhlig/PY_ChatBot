@@ -12,39 +12,38 @@ class UserService:
     def __init__(self, database: DatabaseInterface):
         self.db = database
 
-    def create_user(
-        self, username: str, email: str, password: str
-    ) -> tuple[bool, list[str]]:
-        errors = []
+    def create_user(self, username: str, email: str, password: str) -> tuple[bool, list[str]]:
+        errors = self._validate_user_inputs(username, email, password)
+        if errors:
+            return False, errors
 
-        # Validierung
+        errors = self._check_user_existence(username, email)
+        if errors:
+            return False, errors
+
+        password_hash = PasswordUtils.hash_password_simple(password)
+        return self._attempt_user_creation(username, email, password_hash)
+
+    def _validate_user_inputs(self, username: str, email: str, password: str) -> list[str]:
+        errors = []
         if not ValidationUtils.validate_username(username):
             errors.append("Invalid username format")
-
         if not ValidationUtils.validate_email(email):
             errors.append("Invalid email format")
-
         password_valid, password_errors = ValidationUtils.validate_password(password)
         if not password_valid:
             errors.extend(password_errors)
+        return errors
 
-        if errors:
-            return False, errors
-
-        # Prüfe auf existierende User
+    def _check_user_existence(self, username: str, email: str) -> list[str]:
+        errors = []
         if self.get_user_by_email(email):
             errors.append("Email already registered")
-
         if self.get_user_by_username(username):
             errors.append("Username already taken")
+        return errors
 
-        if errors:
-            return False, errors
-
-        # Passwort hashen
-        password_hash = PasswordUtils.hash_password_simple(password)
-
-        # User erstellen
+    def _attempt_user_creation(self, username: str, email: str, password_hash: str) -> tuple[bool, list[str]]:
         try:
             success = self.db.create_user(username, email.lower(), password_hash)
             if success:
